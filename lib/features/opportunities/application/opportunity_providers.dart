@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../startups/application/startup_providers.dart';
 import '../data/opportunity_repository.dart';
-import '../domain/opportunity.dart';
+import '../data/opportunity.dart';
 
 final opportunityRepositoryProvider =
     Provider<OpportunityRepository>((ref) => OpportunityRepository());

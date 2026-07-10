@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../startups/application/startup_providers.dart';
 import '../application/opportunity_providers.dart';
-import '../domain/opportunity.dart';
+import '../data/opportunity.dart';
 
 class PostOpportunityScreen extends ConsumerStatefulWidget {
   const PostOpportunityScreen({super.key});
