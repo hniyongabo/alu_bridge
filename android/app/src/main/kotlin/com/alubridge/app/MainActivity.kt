@@ -1,4 +1,4 @@
-package com.example.final_flutter_project
+package com.alubridge.app
 
 import io.flutter.embedding.android.FlutterActivity
 
