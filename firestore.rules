@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// INTERIM rules: require sign-in for all access so the app is functional
+// during development. To be tightened before final submission (see
+// docs/development_log.md and todo item "Write and deploy Firestore
+// security rules") with per-collection, field-level constraints, e.g.:
+//  - users/{uid}: only the owning user may write their own document.
+//  - startups/{id}: only the owning rep may edit their own startup; only an
+//    admin may flip `isVerified`.
+//  - opportunities/{id}: only the owning (verified) startup may write.
+//  - applications/{id}: only the applying student may create; only the
+//    student or the owning startup may read/update.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

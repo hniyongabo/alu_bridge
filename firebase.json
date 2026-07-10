@@ -1,0 +1,6 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "flutter": {"platforms":{"android":{"default":{"projectId":"alu-bridge-b4d94","appId":"1:402610662070:android:924f4cd423904655799417","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"alu-bridge-b4d94","configurations":{"android":"1:402610662070:android:924f4cd423904655799417"}}}}}
+}
