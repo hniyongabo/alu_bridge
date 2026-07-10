@@ -54,8 +54,6 @@ dependencies:
 
   # Design system
   google_fonts: ^6.2.1
-  flutter_bloc: ^9.1.1
-  equatable: ^2.1.0
 
 dev_dependencies:
   flutter_test:
