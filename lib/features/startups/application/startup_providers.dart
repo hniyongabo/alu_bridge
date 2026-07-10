@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../auth/application/auth_providers.dart';
-import '../../auth/domain/app_user.dart';
+import '../../auth/data/app_user.dart';
 import '../data/startup_repository.dart';
-import '../domain/startup.dart';
+import '../data/startup.dart';
 
 final startupRepositoryProvider = Provider<StartupRepository>((ref) => StartupRepository());
 

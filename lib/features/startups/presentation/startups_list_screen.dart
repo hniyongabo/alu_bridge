@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../application/startup_providers.dart';
-import '../domain/startup.dart';
+import '../data/startup.dart';
 
 class StartupsListScreen extends ConsumerWidget {
   const StartupsListScreen({super.key});

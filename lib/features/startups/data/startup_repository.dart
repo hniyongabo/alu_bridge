@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../domain/startup.dart';
+import 'startup.dart';
 
 class StartupRepository {
   StartupRepository({FirebaseFirestore? firestore})
