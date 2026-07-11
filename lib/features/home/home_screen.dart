@@ -453,6 +453,11 @@ class _StartupHomeBody extends StatelessWidget {
             onPressed: () => context.push('/opportunities/mine'),
             child: const Text('My Opportunities'),
           ),
+          const SizedBox(height: AppSpacing.sm),
+          OutlinedButton(
+            onPressed: () => context.push('/applicants'),
+            child: const Text('View Applicants'),
+          ),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/auth_providers.dart';
 import '../../features/auth/app_user.dart';
+import '../../features/applications/applicants_screen.dart';
 import '../../features/applications/apply_opportunity_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/signup_screen.dart';
@@ -75,6 +76,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             ApplyOpportunityScreen(opportunity: state.extra as Opportunity),
       ),
+      GoRoute(path: '/applicants', builder: (context, state) => const ApplicantsScreen()),
     ],
   );
 });
