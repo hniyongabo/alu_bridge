@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -52,8 +53,8 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBdTRQRV74n31Q6V5RbBmSWp4XzJNogZpw',
+  static FirebaseOptions get android => FirebaseOptions(
+    apiKey: dotenv.env['API_KEY']!,
     appId: '1:402610662070:android:924f4cd423904655799417',
     messagingSenderId: '402610662070',
     projectId: 'alu-bridge-b4d94',

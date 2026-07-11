@@ -46,3 +46,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment secrets
+lib/.env
+
+# Stitch design exports / large binary assets (not needed in repo)
+docs/stitch_alu_ventureconnect/
+alu_bridge.zip
