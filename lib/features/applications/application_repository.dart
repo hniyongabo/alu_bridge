@@ -73,6 +73,14 @@ class ApplicationRepository {
     await _collection.doc(applicationId).update({'status': status.name});
   }
 
+  Stream<bool> watchHasApplied(String studentUid, String opportunityId) {
+    return _collection
+        .where('opportunityId', isEqualTo: opportunityId)
+        .where('studentUid', isEqualTo: studentUid)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.isNotEmpty);
+  }
+
   /// Idempotent: seeds 2 sample applications for [studentUid] so the
   /// dashboard has real (not hardcoded) data to demo. Safe to call
   /// repeatedly (merges, doesn't duplicate).

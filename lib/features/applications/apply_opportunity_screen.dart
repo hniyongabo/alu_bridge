@@ -68,11 +68,13 @@ class _ApplyOpportunityScreenState extends ConsumerState<ApplyOpportunityScreen>
   @override
   Widget build(BuildContext context) {
     final o = widget.opportunity;
+    final hasAppliedAsync = ref.watch(hasAppliedProvider(o.id));
+    final alreadyApplied = !_submitted && (hasAppliedAsync.valueOrNull ?? false);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Apply')),
       body: SafeArea(
-        child: _submitted
+        child: (_submitted || alreadyApplied)
             ? Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
@@ -81,10 +83,15 @@ class _ApplyOpportunityScreenState extends ConsumerState<ApplyOpportunityScreen>
                     children: [
                       const Icon(Icons.check_circle, color: AppColors.secondary, size: 56),
                       const SizedBox(height: AppSpacing.md),
-                      Text('Application Sent!', style: Theme.of(context).textTheme.headlineMedium),
+                      Text(
+                        _submitted ? 'Application Sent!' : 'Already Applied',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        'Your application to ${o.startupName} has been submitted.',
+                        _submitted
+                            ? 'Your application to ${o.startupName} has been submitted.'
+                            : "You've already applied to this opportunity.",
                         textAlign: TextAlign.center,
                         style: Theme.of(context)
                             .textTheme
