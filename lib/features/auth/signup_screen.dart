@@ -6,8 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/primary_button.dart';
-import '../application/auth_providers.dart';
-import '../data/app_user.dart';
+import 'auth_providers.dart';
+import 'app_user.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});

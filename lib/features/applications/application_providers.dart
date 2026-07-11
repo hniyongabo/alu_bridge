@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../auth/application/auth_providers.dart';
-import '../data/application_repository.dart';
-import '../data/student_application.dart';
+import '../auth/auth_providers.dart';
+import 'application_repository.dart';
+import 'student_application.dart';
 
 final applicationRepositoryProvider =
     Provider<ApplicationRepository>((ref) => ApplicationRepository());

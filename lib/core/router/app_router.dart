@@ -1,18 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/application/auth_providers.dart';
-import '../../features/auth/data/app_user.dart';
-import '../../features/applications/presentation/apply_opportunity_screen.dart';
-import '../../features/auth/presentation/login_screen.dart';
-import '../../features/auth/presentation/signup_screen.dart';
-import '../../features/opportunities/data/opportunity.dart';
-import '../../features/opportunities/presentation/my_opportunities_screen.dart';
-import '../../features/opportunities/presentation/post_opportunity_screen.dart';
+import '../../features/auth/auth_providers.dart';
+import '../../features/auth/app_user.dart';
+import '../../features/applications/apply_opportunity_screen.dart';
+import '../../features/auth/login_screen.dart';
+import '../../features/auth/signup_screen.dart';
+import '../../features/opportunities/opportunity.dart';
+import '../../features/opportunities/my_opportunities_screen.dart';
+import '../../features/opportunities/post_opportunity_screen.dart';
 import '../../features/splash/splash_screen.dart';
-import '../../features/startups/application/startup_providers.dart';
-import '../../features/startups/presentation/create_startup_screen.dart';
-import '../../features/startups/presentation/startups_list_screen.dart';
+import '../../features/startups/startup_providers.dart';
+import '../../features/startups/create_startup_screen.dart';
+import '../../features/startups/startups_list_screen.dart';
 import '../widgets/app_shell.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {

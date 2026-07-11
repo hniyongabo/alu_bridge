@@ -6,14 +6,14 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_card.dart';
-import '../applications/application/application_providers.dart';
-import '../applications/data/student_application.dart';
-import '../auth/application/auth_providers.dart';
-import '../auth/data/app_user.dart';
-import '../opportunities/application/opportunity_providers.dart';
-import '../opportunities/data/opportunity.dart';
-import '../startups/application/startup_providers.dart';
-import '../startups/data/startup.dart';
+import '../applications/application_providers.dart';
+import '../applications/student_application.dart';
+import '../auth/auth_providers.dart';
+import '../auth/app_user.dart';
+import '../opportunities/opportunity_providers.dart';
+import '../opportunities/opportunity.dart';
+import '../startups/startup_providers.dart';
+import '../startups/startup.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});

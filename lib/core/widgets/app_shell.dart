@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/auth/application/auth_providers.dart';
-import '../../features/auth/data/app_user.dart';
+import '../../features/auth/auth_providers.dart';
+import '../../features/auth/app_user.dart';
 import '../../features/home/home_screen.dart';
-import '../../features/opportunities/presentation/discovery_screen.dart';
-import '../../features/opportunities/presentation/post_opportunity_screen.dart';
-import '../../features/profile/presentation/profile_screen.dart';
+import '../../features/opportunities/discovery_screen.dart';
+import '../../features/opportunities/post_opportunity_screen.dart';
+import '../../features/profile/profile_screen.dart';
 
 /// Persistent bottom-nav shell. Students see Home/Discover/Profile;
 /// startup reps see Home/Post/Profile instead of Discover.

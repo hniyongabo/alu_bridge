@@ -5,9 +5,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/primary_button.dart';
-import '../../startups/application/startup_providers.dart';
-import '../application/opportunity_providers.dart';
-import '../data/opportunity.dart';
+import '../startups/startup_providers.dart';
+import 'opportunity_providers.dart';
+import 'opportunity.dart';
 
 class PostOpportunityScreen extends ConsumerStatefulWidget {
   const PostOpportunityScreen({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../startups/application/startup_providers.dart';
-import '../data/opportunity_repository.dart';
-import '../data/opportunity.dart';
+import '../startups/startup_providers.dart';
+import 'opportunity_repository.dart';
+import 'opportunity.dart';
 
 final opportunityRepositoryProvider =
     Provider<OpportunityRepository>((ref) => OpportunityRepository());

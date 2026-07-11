@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../opportunities/application/opportunity_providers.dart';
-import '../application/startup_providers.dart';
-import '../data/startup.dart';
+import '../opportunities/opportunity_providers.dart';
+import 'startup_providers.dart';
+import 'startup.dart';
 
 class StartupsListScreen extends ConsumerWidget {
   const StartupsListScreen({super.key});
