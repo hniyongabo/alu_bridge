@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_card.dart';
 import '../applications/application/application_providers.dart';
 import '../applications/data/student_application.dart';
@@ -298,6 +299,7 @@ class _RecommendationCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
+              style: AppTheme.achievementButtonStyle,
               onPressed: () => context.push('/opportunities/${opportunity.id}/apply', extra: opportunity),
               child: const Text('Apply Now'),
             ),
@@ -380,7 +382,13 @@ class _StartupRow extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(startup.name, style: Theme.of(context).textTheme.labelSmall),
+            Row(
+              children: [
+                const Icon(Icons.verified, size: 14, color: AppColors.tertiaryFixedDim),
+                const SizedBox(width: 4),
+                Text(startup.name, style: Theme.of(context).textTheme.labelSmall),
+              ],
+            ),
             Text(
               startup.category,
               style: Theme.of(context)

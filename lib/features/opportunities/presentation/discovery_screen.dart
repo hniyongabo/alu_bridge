@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../application/opportunity_providers.dart';
 import '../data/opportunity.dart';
@@ -325,6 +326,7 @@ class _OpportunityCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
+              style: AppTheme.achievementButtonStyle,
               onPressed: () =>
                   context.push('/opportunities/${opportunity.id}/apply', extra: opportunity),
               child: const Text('Apply Now'),

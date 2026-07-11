@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
-import '../../../core/widgets/primary_button.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../opportunities/data/opportunity.dart';
 import '../application/application_providers.dart';
@@ -224,10 +224,22 @@ class _ApplyOpportunityScreenState extends ConsumerState<ApplyOpportunityScreen>
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
-                      PrimaryButton(
-                        label: 'Submit Application',
-                        isLoading: _submitting,
-                        onPressed: _submit,
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: AppTheme.achievementButtonStyle,
+                          onPressed: _submitting ? null : _submit,
+                          child: _submitting
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.primaryContainer,
+                                  ),
+                                )
+                              : const Text('Submit Application'),
+                        ),
                       ),
                     ],
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../opportunities/application/opportunity_providers.dart';
 import '../application/startup_providers.dart';
 import '../data/startup.dart';
 
@@ -18,13 +19,14 @@ class StartupsListScreen extends ConsumerWidget {
         title: const Text('ALU Startups'),
         actions: [
           IconButton(
-            tooltip: 'Seed known ALU startups (dev)',
+            tooltip: 'Seed known ALU startups + sample opportunities (dev)',
             icon: const Icon(Icons.cloud_upload_outlined),
             onPressed: () async {
               await ref.read(startupRepositoryProvider).seedKnownStartups();
+              await ref.read(opportunityRepositoryProvider).seedSampleOpportunities();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Seeded known ALU startups')),
+                  const SnackBar(content: Text('Seeded startups and sample opportunities')),
                 );
               }
             },
@@ -138,6 +140,8 @@ class _StartupCard extends StatelessWidget {
           children: [
             Row(
               children: [
+                const Icon(Icons.verified, size: 16, color: AppColors.tertiaryFixedDim),
+                const SizedBox(width: 4),
                 Expanded(
                   child: Text(startup.name, style: Theme.of(context).textTheme.titleMedium),
                 ),
