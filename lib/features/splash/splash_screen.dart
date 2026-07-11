@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/theme/app_colors.dart';
 
@@ -30,12 +29,10 @@ class SplashScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Text(
                 'ALU Bridge',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.02 * 32,
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .displayLarge
+                    ?.copyWith(color: Colors.white),
               ),
               const SizedBox(height: 8),
               Padding(
@@ -43,10 +40,10 @@ class SplashScreen extends StatelessWidget {
                 child: Text(
                   'Connecting ALU students with startup opportunities',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: Colors.white70,
-                    fontSize: 15,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white70),
                 ),
               ),
               const SizedBox(height: 40),
