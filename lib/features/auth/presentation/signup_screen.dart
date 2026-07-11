@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/primary_button.dart';
 import '../application/auth_providers.dart';
 import '../data/app_user.dart';
 
@@ -137,21 +138,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: authState.isLoading ? null : _submit,
-                    child: authState.isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text('Create Account'),
-                  ),
+                PrimaryButton(
+                  label: 'Create Account',
+                  isLoading: authState.isLoading,
+                  onPressed: _submit,
                 ),
                 const SizedBox(height: 16),
                 Center(
