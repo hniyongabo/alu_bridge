@@ -22,6 +22,9 @@ class StudentApplication {
   const StudentApplication({
     required this.id,
     required this.opportunityTitle,
+    required this.startupId,
+    required this.startupName,
+    required this.studentName,
     required this.status,
     this.createdAt,
   });
@@ -31,6 +34,9 @@ class StudentApplication {
     return StudentApplication(
       id: doc.id,
       opportunityTitle: map['opportunityTitle'] as String? ?? '',
+      startupId: map['startupId'] as String? ?? '',
+      startupName: map['startupName'] as String? ?? '',
+      studentName: map['studentName'] as String? ?? '',
       status: ApplicationStatusX.fromString(map['status'] as String? ?? 'inReview'),
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
     );
@@ -38,6 +44,9 @@ class StudentApplication {
 
   final String id;
   final String opportunityTitle;
+  final String startupId;
+  final String startupName;
+  final String studentName;
   final ApplicationStatus status;
   final DateTime? createdAt;
 }

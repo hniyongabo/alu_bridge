@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/widgets/app_card.dart';
-import '../../../core/widgets/primary_button.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/widgets/app_card.dart';
+import '../../core/widgets/primary_button.dart';
 import '../startups/startup_providers.dart';
 import 'opportunity_providers.dart';
 import 'opportunity.dart';

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/app_card.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/widgets/app_card.dart';
 import '../auth/auth_providers.dart';
 import '../opportunities/opportunity.dart';
 import 'application_providers.dart';
+import 'application_repository.dart';
 
 class ApplyOpportunityScreen extends ConsumerStatefulWidget {
   const ApplyOpportunityScreen({super.key, required this.opportunity});
@@ -37,20 +38,28 @@ class _ApplyOpportunityScreenState extends ConsumerState<ApplyOpportunityScreen>
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final uid = ref.read(authStateChangesProvider).valueOrNull?.uid;
-    if (uid == null) return;
+    final studentName = ref.read(currentAppUserProvider).valueOrNull?.displayName;
+    if (uid == null || studentName == null) return;
 
     setState(() => _submitting = true);
     try {
       await ref.read(applicationRepositoryProvider).submitApplication(
             studentUid: uid,
+            studentName: studentName,
             opportunityId: widget.opportunity.id,
             opportunityTitle: widget.opportunity.title,
+            startupId: widget.opportunity.startupId,
+            startupName: widget.opportunity.startupName,
             motivation: _motivationController.text.trim(),
             experience: _experienceController.text.trim(),
             portfolioUrl:
                 _portfolioController.text.trim().isEmpty ? null : _portfolioController.text.trim(),
           );
       if (mounted) setState(() => _submitted = true);
+    } on ApplicationAlreadyExistsException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
