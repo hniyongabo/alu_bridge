@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -319,6 +320,15 @@ class _OpportunityCard extends StatelessWidget {
                   text: AppColors.onSurfaceVariant,
                 ),
             ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () =>
+                  context.push('/opportunities/${opportunity.id}/apply', extra: opportunity),
+              child: const Text('Apply Now'),
+            ),
           ),
         ],
       ),

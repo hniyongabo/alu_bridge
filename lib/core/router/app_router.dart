@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/application/auth_providers.dart';
 import '../../features/auth/data/app_user.dart';
+import '../../features/applications/presentation/apply_opportunity_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/signup_screen.dart';
+import '../../features/opportunities/data/opportunity.dart';
 import '../../features/opportunities/presentation/my_opportunities_screen.dart';
 import '../../features/opportunities/presentation/post_opportunity_screen.dart';
 import '../../features/splash/splash_screen.dart';
@@ -67,6 +69,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/opportunities/post',
         builder: (context, state) => const PostOpportunityScreen(),
+      ),
+      GoRoute(
+        path: '/opportunities/:id/apply',
+        builder: (context, state) =>
+            ApplyOpportunityScreen(opportunity: state.extra as Opportunity),
       ),
     ],
   );
