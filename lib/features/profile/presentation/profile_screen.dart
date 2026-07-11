@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../auth/application/auth_providers.dart';
-import '../auth/data/app_user.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../auth/application/auth_providers.dart';
+import '../../auth/data/app_user.dart';
 
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+class ProfileScreen extends ConsumerWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appUserAsync = ref.watch(currentAppUserProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('ALU Bridge')),
+      appBar: AppBar(title: const Text('Profile')),
       body: appUserAsync.when(
         data: (appUser) {
           if (appUser == null) {
@@ -25,13 +24,19 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Welcome, ${appUser.displayName} 👋',
-                  style: Theme.of(context).textTheme.headlineMedium,
+                CircleAvatar(
+                  radius: 32,
+                  backgroundColor: AppColors.primaryContainer,
+                  child: Text(
+                    appUser.displayName.isNotEmpty ? appUser.displayName[0].toUpperCase() : '?',
+                    style: const TextStyle(color: Colors.white, fontSize: 24),
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
+                Text(appUser.displayName, style: Theme.of(context).textTheme.headlineMedium),
+                const SizedBox(height: 4),
                 Text(
-                  'Signed in as ${appUser.email}',
+                  appUser.email,
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium
@@ -39,18 +44,12 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Chip(label: Text(appUser.role.value.toUpperCase())),
-                const SizedBox(height: 24),
-                OutlinedButton(
-                  onPressed: () => context.push('/startups'),
-                  child: const Text('Browse ALU Startups'),
+                const SizedBox(height: 32),
+                OutlinedButton.icon(
+                  onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
+                  icon: const Icon(Icons.logout_outlined),
+                  label: const Text('Sign Out'),
                 ),
-                if (appUser.role == UserRole.startup) ...[
-                  const SizedBox(height: 12),
-                  OutlinedButton(
-                    onPressed: () => context.push('/opportunities/mine'),
-                    child: const Text('My Opportunities'),
-                  ),
-                ],
               ],
             ),
           );

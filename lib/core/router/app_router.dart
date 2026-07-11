@@ -2,16 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/application/auth_providers.dart';
-import '../../features/auth/domain/app_user.dart';
+import '../../features/auth/data/app_user.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/signup_screen.dart';
-import '../../features/home/home_screen.dart';
 import '../../features/opportunities/presentation/my_opportunities_screen.dart';
 import '../../features/opportunities/presentation/post_opportunity_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/startups/application/startup_providers.dart';
 import '../../features/startups/presentation/create_startup_screen.dart';
 import '../../features/startups/presentation/startups_list_screen.dart';
+import '../widgets/app_shell.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateChangesProvider);
@@ -54,7 +54,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/signup', builder: (context, state) => const SignUpScreen()),
-      GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+      GoRoute(path: '/home', builder: (context, state) => const AppShell()),
       GoRoute(
         path: '/startup/create',
         builder: (context, state) => const CreateStartupScreen(),
