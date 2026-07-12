@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,36 +24,17 @@ class _ApplyOpportunityScreenState extends ConsumerState<ApplyOpportunityScreen>
   final _motivationController = TextEditingController();
   final _experienceController = TextEditingController();
   final _portfolioController = TextEditingController();
+  final _resumeLinkController = TextEditingController();
   bool _submitting = false;
   bool _submitted = false;
-  PlatformFile? _resumeFile;
-
-  static const _maxResumeBytes = 5 * 1024 * 1024;
 
   @override
   void dispose() {
     _motivationController.dispose();
     _experienceController.dispose();
     _portfolioController.dispose();
+    _resumeLinkController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickResume() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx'],
-    );
-    if (result == null || result.files.isEmpty) return;
-    final file = result.files.single;
-    if (file.size > _maxResumeBytes) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File must be 5MB or smaller')),
-        );
-      }
-      return;
-    }
-    setState(() => _resumeFile = file);
   }
 
   Future<void> _submit() async {
@@ -67,16 +45,6 @@ class _ApplyOpportunityScreenState extends ConsumerState<ApplyOpportunityScreen>
 
     setState(() => _submitting = true);
     try {
-      String? resumeUrl;
-      final resumeFile = _resumeFile;
-      if (resumeFile != null && resumeFile.path != null) {
-        resumeUrl = await ref.read(applicationRepositoryProvider).uploadResume(
-              studentUid: uid,
-              opportunityId: widget.opportunity.id,
-              file: File(resumeFile.path!),
-              fileName: resumeFile.name,
-            );
-      }
       await ref.read(applicationRepositoryProvider).submitApplication(
             studentUid: uid,
             studentName: studentName,
@@ -88,7 +56,8 @@ class _ApplyOpportunityScreenState extends ConsumerState<ApplyOpportunityScreen>
             experience: _experienceController.text.trim(),
             portfolioUrl:
                 _portfolioController.text.trim().isEmpty ? null : _portfolioController.text.trim(),
-            resumeUrl: resumeUrl,
+            resumeUrl:
+                _resumeLinkController.text.trim().isEmpty ? null : _resumeLinkController.text.trim(),
           );
       if (mounted) setState(() => _submitted = true);
     } on ApplicationAlreadyExistsException catch (e) {
@@ -234,48 +203,13 @@ class _ApplyOpportunityScreenState extends ConsumerState<ApplyOpportunityScreen>
                             (v == null || v.trim().isEmpty) ? 'This field is required' : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
-                      Text('ADDITIONAL DOCUMENTS OR PORTFOLIO',
-                          style: Theme.of(context).textTheme.labelSmall),
-                      const SizedBox(height: AppSpacing.sm),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: _pickResume,
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(AppSpacing.lg),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: _resumeFile != null
-                                  ? AppColors.secondary
-                                  : AppColors.outlineVariant,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                _resumeFile != null
-                                    ? Icons.check_circle_outline
-                                    : Icons.cloud_upload_outlined,
-                                size: 40,
-                                color: _resumeFile != null ? AppColors.secondary : AppColors.outline,
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text(
-                                _resumeFile?.name ?? 'Upload CV/Resume',
-                                style: Theme.of(context).textTheme.titleMedium,
-                                textAlign: TextAlign.center,
-                              ),
-                              Text(
-                                _resumeFile != null ? 'Tap to replace' : 'PDF or DOCX (Max 5MB)',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
-                                    ?.copyWith(color: AppColors.onSurfaceVariant),
-                              ),
-                            ],
-                          ),
+                      TextFormField(
+                        controller: _resumeLinkController,
+                        keyboardType: TextInputType.url,
+                        decoration: const InputDecoration(
+                          labelText: 'Resume/CV Link (Google Drive)',
+                          hintText: 'https://drive.google.com/...',
+                          prefixIcon: Icon(Icons.description_outlined),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),

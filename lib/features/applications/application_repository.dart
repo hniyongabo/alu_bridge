@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 import 'student_application.dart';
 
@@ -74,19 +71,6 @@ class ApplicationRepository {
     });
   }
 
-  /// Uploads a resume file and returns its public download URL.
-  Future<String> uploadResume({
-    required String studentUid,
-    required String opportunityId,
-    required File file,
-    required String fileName,
-  }) async {
-    final ref =
-        FirebaseStorage.instance.ref().child('resumes/$studentUid/$opportunityId/$fileName');
-    await ref.putFile(file);
-    return ref.getDownloadURL();
-  }
-
   Future<void> updateStatus(String applicationId, ApplicationStatus status) async {
     await _collection.doc(applicationId).update({'status': status.name});
   }
@@ -97,29 +81,5 @@ class ApplicationRepository {
         .where('studentUid', isEqualTo: studentUid)
         .snapshots()
         .map((snapshot) => snapshot.docs.isNotEmpty);
-  }
-
-  /// Idempotent: seeds 2 sample applications for [studentUid] so the
-  /// dashboard has real (not hardcoded) data to demo. Safe to call
-  /// repeatedly (merges, doesn't duplicate).
-  Future<void> seedSampleApplications(String studentUid) async {
-    final batch = _firestore.batch();
-    final samples = [
-      {'id': 'sample-1', 'title': 'Frontend Developer', 'status': ApplicationStatus.inReview},
-      {'id': 'sample-2', 'title': 'Data Analyst Intern', 'status': ApplicationStatus.interviewed},
-    ];
-    for (final s in samples) {
-      batch.set(
-        _collection.doc('${studentUid}_${s['id']}'),
-        {
-          'studentUid': studentUid,
-          'opportunityTitle': s['title'],
-          'status': (s['status'] as ApplicationStatus).name,
-          'createdAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
-    }
-    await batch.commit();
   }
 }

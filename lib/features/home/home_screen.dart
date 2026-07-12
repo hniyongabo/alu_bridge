@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +14,6 @@ import '../auth/app_user.dart';
 import '../opportunities/opportunity_providers.dart';
 import '../opportunities/opportunity.dart';
 import '../startups/startup_providers.dart';
-import '../startups/startup.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -70,7 +70,6 @@ class _StudentHomeBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final opportunitiesAsync = ref.watch(activeOpportunitiesProvider);
-    final startupsAsync = ref.watch(verifiedStartupsProvider);
     final applicationsAsync = ref.watch(myApplicationsProvider);
 
     return SingleChildScrollView(
@@ -159,21 +158,10 @@ class _StudentHomeBody extends ConsumerWidget {
 
           // Applications
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.assignment_turned_in_outlined, color: AppColors.primaryContainer),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text('Applications', style: Theme.of(context).textTheme.titleMedium),
-                ],
-              ),
-              IconButton(
-                tooltip: 'Seed sample applications (dev)',
-                icon: const Icon(Icons.cloud_upload_outlined, size: 20),
-                onPressed: () =>
-                    ref.read(applicationRepositoryProvider).seedSampleApplications(appUser.uid),
-              ),
+              const Icon(Icons.assignment_turned_in_outlined, color: AppColors.primaryContainer),
+              const SizedBox(width: AppSpacing.xs),
+              Text('Applications', style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -207,24 +195,33 @@ class _StudentHomeBody extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
 
-          // Featured Startups
+          // Startups You Applied To
           Row(
             children: [
-              const Icon(Icons.trending_up, color: AppColors.secondary),
+              const Icon(CupertinoIcons.briefcase_fill, color: AppColors.tertiary, size: 20),
               const SizedBox(width: AppSpacing.xs),
-              Text('Featured Startups', style: Theme.of(context).textTheme.titleMedium),
+              Text('Startups You Applied To', style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          startupsAsync.when(
-            data: (startups) {
-              if (startups.isEmpty) return const Text('No startups yet.');
+          applicationsAsync.when(
+            data: (applications) {
+              final seen = <String>{};
+              final appliedStartupNames = <String>[];
+              for (final app in applications) {
+                if (app.startupId.isEmpty || seen.contains(app.startupId)) continue;
+                seen.add(app.startupId);
+                appliedStartupNames.add(app.startupName);
+              }
+              if (appliedStartupNames.isEmpty) {
+                return const Text("You haven't applied to any startups yet.");
+              }
               return Column(
                 children: [
-                  for (final s in startups.take(3))
+                  for (final name in appliedStartupNames)
                     Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: _StartupRow(startup: s),
+                      child: _AppliedStartupRow(startupName: name),
                     ),
                 ],
               );
@@ -356,10 +353,10 @@ class _ApplicationRow extends StatelessWidget {
   }
 }
 
-class _StartupRow extends StatelessWidget {
-  const _StartupRow({required this.startup});
+class _AppliedStartupRow extends StatelessWidget {
+  const _AppliedStartupRow({required this.startupName});
 
-  final Startup startup;
+  final String startupName;
 
   @override
   Widget build(BuildContext context) {
@@ -374,28 +371,17 @@ class _StartupRow extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: Text(
-            startup.name.isNotEmpty ? startup.name[0].toUpperCase() : '?',
+            startupName.isNotEmpty ? startupName[0].toUpperCase() : '?',
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ),
         const SizedBox(width: AppSpacing.md),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Row(
-              children: [
-                const Icon(Icons.verified, size: 14, color: AppColors.tertiaryFixedDim),
-                const SizedBox(width: 4),
-                Text(startup.name, style: Theme.of(context).textTheme.labelSmall),
-              ],
-            ),
-            Text(
-              startup.category,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall
-                  ?.copyWith(color: AppColors.outline, fontSize: 10),
-            ),
+            const Icon(CupertinoIcons.checkmark_seal_fill,
+                size: 14, color: AppColors.tertiaryFixedDim),
+            const SizedBox(width: 4),
+            Text(startupName, style: Theme.of(context).textTheme.labelSmall),
           ],
         ),
       ],
