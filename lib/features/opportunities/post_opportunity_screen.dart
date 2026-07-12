@@ -186,10 +186,13 @@ class _PostOpportunityScreenState extends ConsumerState<PostOpportunityScreen> {
                               Expanded(
                                 child: DropdownButtonFormField<OpportunityType>(
                                   initialValue: _type,
+                                  isExpanded: true,
                                   decoration: const InputDecoration(labelText: 'Type'),
                                   items: OpportunityType.values
-                                      .map((t) =>
-                                          DropdownMenuItem(value: t, child: Text(t.label)))
+                                      .map((t) => DropdownMenuItem(
+                                            value: t,
+                                            child: Text(t.label, overflow: TextOverflow.ellipsis),
+                                          ))
                                       .toList(),
                                   onChanged: (v) =>
                                       setState(() => _type = v ?? OpportunityType.internship),
@@ -221,9 +224,13 @@ class _PostOpportunityScreenState extends ConsumerState<PostOpportunityScreen> {
                           const SizedBox(height: AppSpacing.lg),
                           DropdownButtonFormField<String>(
                             initialValue: _category,
+                            isExpanded: true,
                             decoration: const InputDecoration(labelText: 'Skill Category'),
                             items: opportunityCategories
-                                .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                                .map((c) => DropdownMenuItem(
+                                      value: c,
+                                      child: Text(c, overflow: TextOverflow.ellipsis),
+                                    ))
                                 .toList(),
                             onChanged: (v) =>
                                 setState(() => _category = v ?? opportunityCategories.first),

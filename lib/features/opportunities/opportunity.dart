@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum OpportunityType { internship, volunteering, research }
+enum OpportunityType { internship, volunteering, research, contract }
 
 extension OpportunityTypeX on OpportunityType {
   String get value => name;
@@ -9,6 +9,7 @@ extension OpportunityTypeX on OpportunityType {
         OpportunityType.internship => 'Internship',
         OpportunityType.volunteering => 'Volunteering',
         OpportunityType.research => 'Research',
+        OpportunityType.contract => 'Contract',
       };
 
   static OpportunityType fromString(String value) {

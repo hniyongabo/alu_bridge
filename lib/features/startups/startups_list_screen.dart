@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
-import '../opportunities/opportunity_providers.dart';
 import 'startup_providers.dart';
 import 'startup.dart';
 
@@ -15,24 +14,7 @@ class StartupsListScreen extends ConsumerWidget {
     final ownedAsync = ref.watch(currentUserStartupProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ALU Startups'),
-        actions: [
-          IconButton(
-            tooltip: 'Seed known ALU startups + sample opportunities (dev)',
-            icon: const Icon(Icons.cloud_upload_outlined),
-            onPressed: () async {
-              await ref.read(startupRepositoryProvider).seedKnownStartups();
-              await ref.read(opportunityRepositoryProvider).seedSampleOpportunities();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Seeded startups and sample opportunities')),
-                );
-              }
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('ALU Startups')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -52,7 +34,7 @@ class StartupsListScreen extends ConsumerWidget {
                 return const Padding(
                   padding: EdgeInsets.only(top: 48),
                   child: Center(
-                    child: Text('No verified startups yet. Tap the seed icon to add the known ALU ventures.'),
+                    child: Text('No verified startups yet.'),
                   ),
                 );
               }

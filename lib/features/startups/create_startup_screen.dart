@@ -3,18 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../auth/auth_providers.dart';
+import 'startup.dart';
 import 'startup_providers.dart';
-
-const _categories = [
-  'Community',
-  'EdTech',
-  'Marketplace',
-  'AgriTech',
-  'Lifestyle',
-  'Fintech',
-  'Health',
-  'Other',
-];
 
 class CreateStartupScreen extends ConsumerStatefulWidget {
   const CreateStartupScreen({super.key});
@@ -28,7 +18,7 @@ class _CreateStartupScreenState extends ConsumerState<CreateStartupScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _websiteController = TextEditingController();
-  String _category = _categories.first;
+  String _category = startupCategories.first;
   bool _submitting = false;
   String? _error;
 
@@ -113,11 +103,13 @@ class _CreateStartupScreenState extends ConsumerState<CreateStartupScreen> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   initialValue: _category,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Category'),
-                  items: _categories
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                  items: startupCategories
+                      .map((c) =>
+                          DropdownMenuItem(value: c, child: Text(c, overflow: TextOverflow.ellipsis)))
                       .toList(),
-                  onChanged: (value) => setState(() => _category = value ?? _categories.first),
+                  onChanged: (value) => setState(() => _category = value ?? startupCategories.first),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(

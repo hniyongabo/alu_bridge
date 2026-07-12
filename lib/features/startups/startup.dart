@@ -1,5 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+const startupCategories = [
+  'Community',
+  'EdTech',
+  'Marketplace',
+  'AgriTech',
+  'Lifestyle',
+  'Shipping',
+  'Fintech',
+  'Health',
+  'Other',
+];
+
 class Startup {
   const Startup({
     required this.id,

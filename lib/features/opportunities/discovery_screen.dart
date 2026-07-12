@@ -237,8 +237,8 @@ class _FilterChip extends StatelessWidget {
 
 /// Maps an opportunity type to the Kinetic Horizon tag colors. DESIGN.md
 /// only defines Internship/Volunteering/Full-time tag colors; "research"
-/// (our third type, replacing "full-time") reuses the peach/burnt-orange
-/// pairing since it's the remaining undesignated slot.
+/// reuses the peach/burnt-orange ("full-time") pairing, and "contract"
+/// reuses the tertiary (gold/brown) token family as a 4th distinct tag.
 ({Color bg, Color text}) _typeTagColors(OpportunityType type) {
   switch (type) {
     case OpportunityType.internship:
@@ -247,6 +247,8 @@ class _FilterChip extends StatelessWidget {
       return (bg: AppColors.volunteeringBg, text: AppColors.volunteeringText);
     case OpportunityType.research:
       return (bg: AppColors.fullTimeBg, text: AppColors.fullTimeText);
+    case OpportunityType.contract:
+      return (bg: AppColors.tertiaryContainer, text: AppColors.onTertiaryContainer);
   }
 }
 
