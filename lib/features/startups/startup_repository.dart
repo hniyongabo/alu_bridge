@@ -57,6 +57,21 @@ class StartupRepository {
     await _collection.doc(startupId).update({'isVerified': isVerified});
   }
 
+  Future<void> updateStartup({
+    required String startupId,
+    required String name,
+    required String description,
+    required String category,
+    String? website,
+  }) async {
+    await _collection.doc(startupId).update({
+      'name': name,
+      'description': description,
+      'category': category,
+      'website': website,
+    });
+  }
+
   /// Idempotent: pre-verifies the known ALU startups so the platform is
   /// demonstrably gated to recognized ventures from day one. Safe to call
   /// repeatedly (merges, doesn't duplicate).

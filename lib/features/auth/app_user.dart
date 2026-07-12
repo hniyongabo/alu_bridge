@@ -19,6 +19,8 @@ class AppUser {
     required this.email,
     required this.displayName,
     required this.role,
+    this.skills = const [],
+    this.portfolioUrl,
     this.createdAt,
   });
 
@@ -28,6 +30,8 @@ class AppUser {
       email: map['email'] as String? ?? '',
       displayName: map['displayName'] as String? ?? '',
       role: UserRoleX.fromString(map['role'] as String? ?? 'student'),
+      skills: (map['skills'] as List<dynamic>?)?.cast<String>() ?? const [],
+      portfolioUrl: map['portfolioUrl'] as String?,
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
     );
   }
@@ -36,6 +40,8 @@ class AppUser {
   final String email;
   final String displayName;
   final UserRole role;
+  final List<String> skills;
+  final String? portfolioUrl;
   final DateTime? createdAt;
 
   Map<String, dynamic> toMap() {

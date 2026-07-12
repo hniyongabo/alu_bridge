@@ -49,4 +49,20 @@ class AuthRepository {
   }
 
   Future<void> signOut() => _auth.signOut();
+
+  Future<void> updateStudentProfile({
+    required String uid,
+    required String displayName,
+    required List<String> skills,
+    String? portfolioUrl,
+  }) async {
+    if (_auth.currentUser != null) {
+      await _auth.currentUser!.updateDisplayName(displayName);
+    }
+    await _firestore.collection('users').doc(uid).update({
+      'displayName': displayName,
+      'skills': skills,
+      'portfolioUrl': portfolioUrl,
+    });
+  }
 }
