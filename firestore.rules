@@ -1,5 +1,6 @@
 rules_version = '2';
 
+// (redeployed to force-overwrite any console drift)
 // INTERIM rules: require sign-in for all access so the app is functional
 // during development. To be tightened before final submission (see
 // docs/development_log.md and todo item "Write and deploy Firestore

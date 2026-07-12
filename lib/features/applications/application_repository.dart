@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'student_application.dart';
 
@@ -44,6 +47,7 @@ class ApplicationRepository {
     required String motivation,
     required String experience,
     String? portfolioUrl,
+    String? resumeUrl,
   }) async {
     final existing = await _collection
         .where('opportunityId', isEqualTo: opportunityId)
@@ -64,9 +68,23 @@ class ApplicationRepository {
       'motivation': motivation,
       'experience': experience,
       'portfolioUrl': portfolioUrl,
+      'resumeUrl': resumeUrl,
       'status': ApplicationStatus.inReview.name,
       'createdAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  /// Uploads a resume file and returns its public download URL.
+  Future<String> uploadResume({
+    required String studentUid,
+    required String opportunityId,
+    required File file,
+    required String fileName,
+  }) async {
+    final ref =
+        FirebaseStorage.instance.ref().child('resumes/$studentUid/$opportunityId/$fileName');
+    await ref.putFile(file);
+    return ref.getDownloadURL();
   }
 
   Future<void> updateStatus(String applicationId, ApplicationStatus status) async {
