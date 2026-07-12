@@ -403,14 +403,17 @@ class _StartupRow extends StatelessWidget {
   }
 }
 
-class _StartupHomeBody extends StatelessWidget {
+class _StartupHomeBody extends ConsumerWidget {
   const _StartupHomeBody({required this.appUser});
 
   final AppUser appUser;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final startupAsync = ref.watch(currentUserStartupProvider);
+    final opportunitiesAsync = ref.watch(myStartupOpportunitiesProvider);
+
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.marginMobile),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,21 +447,202 @@ class _StartupHomeBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
+          startupAsync.when(
+            data: (startup) {
+              if (startup == null) return const SizedBox.shrink();
+              final applicantsAsync = ref.watch(applicantsForStartupProvider(startup.id));
+              final applicantsCount = applicantsAsync.valueOrNull?.length ?? 0;
+              final opportunitiesCount = opportunitiesAsync.valueOrNull?.length ?? 0;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppCard(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.add_a_photo_outlined,
+                              color: AppColors.onSurfaceVariant),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  if (startup.isVerified) ...[
+                                    const Icon(Icons.verified,
+                                        size: 16, color: AppColors.tertiaryFixedDim),
+                                    const SizedBox(width: 4),
+                                  ],
+                                  Expanded(
+                                    child: Text(startup.name,
+                                        style: Theme.of(context).textTheme.titleMedium),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                startup.category,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(color: AppColors.outline),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                startup.description,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: AppColors.onSurfaceVariant),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _StatTile(
+                          icon: Icons.work_outline,
+                          label: 'Opportunities',
+                          value: '$opportunitiesCount',
+                          onTap: () => context.push('/opportunities/mine'),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _StatTile(
+                          icon: Icons.people_outline,
+                          label: 'Applicants',
+                          value: '$applicantsCount',
+                          onTap: () => context.push('/applicants'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => Text('Error: $error'),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Recent Opportunities', style: Theme.of(context).textTheme.titleMedium),
+              TextButton(
+                onPressed: () => context.push('/opportunities/mine'),
+                child: const Text('View All'),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          opportunitiesAsync.when(
+            data: (opportunities) {
+              if (opportunities.isEmpty) {
+                return const Text('No opportunities posted yet.');
+              }
+              return Column(
+                children: [
+                  for (final o in opportunities.take(2))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: AppCard(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(o.title, style: Theme.of(context).textTheme.labelSmall),
+                            ),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: o.isActive
+                                    ? AppColors.secondaryContainer
+                                    : AppColors.surfaceContainer,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                o.isActive ? 'Active' : 'Closed',
+                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: o.isActive
+                                          ? AppColors.onSecondaryContainer
+                                          : AppColors.onSurfaceVariant,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => Text('Error: $error'),
+          ),
+          const SizedBox(height: AppSpacing.lg),
           OutlinedButton(
             onPressed: () => context.push('/startups'),
             child: const Text('Browse ALU Startups'),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          OutlinedButton(
-            onPressed: () => context.push('/opportunities/mine'),
-            child: const Text('My Opportunities'),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          OutlinedButton(
-            onPressed: () => context.push('/applicants'),
-            child: const Text('View Applicants'),
-          ),
         ],
+      ),
+    );
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: AppCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: AppColors.secondary),
+            const SizedBox(height: AppSpacing.xs),
+            Text(value, style: Theme.of(context).textTheme.headlineMedium),
+            Text(
+              label,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelSmall
+                  ?.copyWith(color: AppColors.onSurfaceVariant),
+            ),
+          ],
+        ),
       ),
     );
   }
