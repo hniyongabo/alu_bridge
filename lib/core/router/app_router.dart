@@ -5,15 +5,16 @@ import '../../features/auth/auth_providers.dart';
 import '../../features/auth/app_user.dart';
 import '../../features/applications/applicants_screen.dart';
 import '../../features/applications/apply_opportunity_screen.dart';
+import '../../features/applications/my_applications_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/signup_screen.dart';
 import '../../features/opportunities/opportunity.dart';
 import '../../features/opportunities/my_opportunities_screen.dart';
+import '../../features/opportunities/opportunity_details_screen.dart';
 import '../../features/opportunities/post_opportunity_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/startups/startup_providers.dart';
 import '../../features/startups/create_startup_screen.dart';
-import '../../features/startups/startups_list_screen.dart';
 import '../widgets/app_shell.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -62,7 +63,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/startup/create',
         builder: (context, state) => const CreateStartupScreen(),
       ),
-      GoRoute(path: '/startups', builder: (context, state) => const StartupsListScreen()),
       GoRoute(
         path: '/opportunities/mine',
         builder: (context, state) => const MyOpportunitiesScreen(),
@@ -76,7 +76,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             ApplyOpportunityScreen(opportunity: state.extra as Opportunity),
       ),
+      GoRoute(
+        path: '/opportunities/:id',
+        builder: (context, state) =>
+            OpportunityDetailsScreen(opportunity: state.extra as Opportunity),
+      ),
       GoRoute(path: '/applicants', builder: (context, state) => const ApplicantsScreen()),
+      GoRoute(
+        path: '/applications/mine',
+        builder: (context, state) => const MyApplicationsScreen(),
+      ),
     ],
   );
 });

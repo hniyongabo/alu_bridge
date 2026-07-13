@@ -8,6 +8,7 @@ import '../../core/widgets/primary_button.dart';
 import '../startups/startup_providers.dart';
 import 'opportunity_providers.dart';
 import 'opportunity.dart';
+import 'package:alu_bridge/core/widgets/app_error_state.dart';
 
 class PostOpportunityScreen extends ConsumerStatefulWidget {
   const PostOpportunityScreen({super.key});
@@ -314,7 +315,7 @@ class _PostOpportunityScreenState extends ConsumerState<PostOpportunityScreen> {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(child: Text('Error: $error')),
+          error: (error, stack) => const Center(child: AppErrorState()),
         ),
       ),
     );

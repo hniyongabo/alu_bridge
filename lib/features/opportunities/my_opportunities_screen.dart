@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import 'opportunity_providers.dart';
 import 'opportunity.dart';
+import 'package:alu_bridge/core/widgets/app_error_state.dart';
 
 class MyOpportunitiesScreen extends ConsumerWidget {
   const MyOpportunitiesScreen({super.key});
@@ -43,7 +44,7 @@ class MyOpportunitiesScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
+        error: (error, stack) => const Center(child: AppErrorState()),
       ),
     );
   }

@@ -8,6 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/app_card.dart';
 import 'opportunity_providers.dart';
 import 'opportunity.dart';
+import 'package:alu_bridge/core/widgets/app_error_state.dart';
 
 class DiscoveryScreen extends ConsumerStatefulWidget {
   const DiscoveryScreen({super.key});
@@ -202,7 +203,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(child: Text('Error: $error')),
+              error: (error, stack) => const Center(child: AppErrorState()),
             ),
           ),
         ],
@@ -252,16 +253,19 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _OpportunityCard extends StatelessWidget {
+class _OpportunityCard extends ConsumerWidget {
   const _OpportunityCard({required this.opportunity});
 
   final Opportunity opportunity;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tagColors = _typeTagColors(opportunity.type);
 
-    return AppCard(
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () => context.push('/opportunities/${opportunity.id}', extra: opportunity),
+      child: AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -335,6 +339,7 @@ class _OpportunityCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

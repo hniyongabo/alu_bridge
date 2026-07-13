@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/primary_button.dart';
+import '../applications/application_providers.dart';
+import '../applications/student_application.dart';
 import '../auth/app_user.dart';
 import '../auth/auth_providers.dart';
+import '../opportunities/opportunity_providers.dart';
 import '../startups/startup.dart';
 import '../startups/startup_providers.dart';
+import 'package:alu_bridge/core/widgets/app_error_state.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -28,34 +33,60 @@ class ProfileScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 32,
-                  backgroundColor: AppColors.primaryContainer,
-                  child: Text(
-                    appUser.displayName.isNotEmpty ? appUser.displayName[0].toUpperCase() : '?',
-                    style: const TextStyle(color: Colors.white, fontSize: 24),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.fromBorderSide(
+                        BorderSide(color: AppColors.tertiaryFixedDim, width: 3),
+                      ),
+                    ),
+                    child: CircleAvatar(
+                      radius: 44,
+                      backgroundColor: AppColors.primaryContainer,
+                      child: Text(
+                        appUser.displayName.isNotEmpty
+                            ? appUser.displayName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(color: Colors.white, fontSize: 32),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Text(appUser.displayName, style: Theme.of(context).textTheme.headlineMedium),
+                Center(
+                  child: Text(appUser.displayName, style: Theme.of(context).textTheme.headlineMedium),
+                ),
                 const SizedBox(height: 4),
-                Text(
-                  appUser.email,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: AppColors.onSurfaceVariant),
+                Center(
+                  child: Text(
+                    appUser.email,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: AppColors.onSurfaceVariant),
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Chip(label: Text(appUser.role.value.toUpperCase())),
+                Center(child: Chip(label: Text(appUser.role.value.toUpperCase()))),
                 const SizedBox(height: AppSpacing.lg),
                 if (appUser.role == UserRole.startup)
-                  _StartupProfileSection(appUser: appUser)
+                  _StartupStatsRow()
                 else
-                  _StudentProfileSection(appUser: appUser),
+                  _StudentStatsRow(),
+                const SizedBox(height: AppSpacing.lg),
+                if (appUser.role == UserRole.startup)
+                  _StartupMenuList(appUser: appUser)
+                else
+                  _StudentMenuList(appUser: appUser),
                 const SizedBox(height: AppSpacing.lg),
                 OutlinedButton.icon(
                   onPressed: () => ref.read(authControllerProvider.notifier).signOut(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.tertiary,
+                    side: const BorderSide(color: AppColors.tertiaryFixedDim),
+                  ),
                   icon: const Icon(Icons.logout_outlined),
                   label: const Text('Sign Out'),
                 ),
@@ -64,62 +95,191 @@ class ProfileScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
+        error: (error, stack) => const Center(child: AppErrorState()),
       ),
     );
   }
 }
 
-class _StudentProfileSection extends StatelessWidget {
-  const _StudentProfileSection({required this.appUser});
+class _StatTile extends StatelessWidget {
+  const _StatTile({required this.value, required this.label});
+
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(value,
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(color: AppColors.primaryContainer)),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatsRowCard extends StatelessWidget {
+  const _StatsRowCard({required this.tiles});
+
+  final List<Widget> tiles;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Row(children: tiles),
+    );
+  }
+}
+
+class _StudentStatsRow extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final applications = ref.watch(myApplicationsProvider).valueOrNull ?? const <StudentApplication>[];
+    final accepted = applications.where((a) => a.status == ApplicationStatus.accepted).length;
+
+    return _StatsRowCard(tiles: [
+      _StatTile(value: '${applications.length}', label: 'Applications'),
+      _StatTile(value: '$accepted', label: 'Accepted'),
+    ]);
+  }
+}
+
+class _StartupStatsRow extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final startup = ref.watch(currentUserStartupProvider).valueOrNull;
+    final opportunities = ref.watch(myStartupOpportunitiesProvider).valueOrNull ?? const [];
+    final applicants = startup == null
+        ? const <StudentApplication>[]
+        : ref.watch(applicantsForStartupProvider(startup.id)).valueOrNull ?? const <StudentApplication>[];
+    final accepted = applicants.where((a) => a.status == ApplicationStatus.accepted).length;
+
+    return _StatsRowCard(tiles: [
+      _StatTile(value: '${opportunities.length}', label: 'Opportunities'),
+      _StatTile(value: '${applicants.length}', label: 'Applicants'),
+      _StatTile(value: '$accepted', label: 'Accepted'),
+    ]);
+  }
+}
+
+class _MenuRow extends StatelessWidget {
+  const _MenuRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.large = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool large;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: large ? AppSpacing.md : AppSpacing.sm),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.tertiaryFixedDim, size: large ? 28 : 22),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                label,
+                style: large
+                    ? Theme.of(context).textTheme.titleMedium
+                    : Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: AppColors.outline),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MenuListCard extends StatelessWidget {
+  const _MenuListCard({required this.rows});
+
+  final List<Widget> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppColors.cardShadow,
+      ),
+      child: Column(
+        children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            rows[i],
+            if (i != rows.length - 1) const Divider(height: 1),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StudentMenuList extends StatelessWidget {
+  const _StudentMenuList({required this.appUser});
 
   final AppUser appUser;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Skills', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: AppSpacing.sm),
-        if (appUser.skills.isEmpty)
-          Text(
-            'No skills added yet.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
-          )
-        else
-          Wrap(
-            spacing: AppSpacing.xs,
-            runSpacing: AppSpacing.xs,
-            children: [
-              for (final skill in appUser.skills)
-                Chip(label: Text(skill), backgroundColor: AppColors.surfaceContainer),
-            ],
-          ),
-        const SizedBox(height: AppSpacing.md),
-        Text('Portfolio URL', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          (appUser.portfolioUrl?.isNotEmpty ?? false) ? appUser.portfolioUrl! : 'Not added yet.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+    return _MenuListCard(rows: [
+      _MenuRow(
+        icon: Icons.person_outline,
+        label: 'My Profile',
+        onTap: () => showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _EditStudentProfileSheet(appUser: appUser),
         ),
-        const SizedBox(height: AppSpacing.lg),
-        OutlinedButton.icon(
-          onPressed: () => showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (_) => _EditStudentProfileSheet(appUser: appUser),
-          ),
-          icon: const Icon(Icons.edit_outlined),
-          label: const Text('Edit Profile'),
+      ),
+      _MenuRow(
+        icon: Icons.star_border,
+        label: 'Skills & Interests',
+        onTap: () => showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _SkillsAndInterestsSheet(appUser: appUser),
         ),
-      ],
-    );
+      ),
+      _MenuRow(
+        icon: Icons.assignment_outlined,
+        label: 'My Applications',
+        onTap: () => context.push('/applications/mine'),
+      ),
+    ]);
   }
 }
 
-class _StartupProfileSection extends ConsumerWidget {
-  const _StartupProfileSection({required this.appUser});
+class _StartupMenuList extends ConsumerWidget {
+  const _StartupMenuList({required this.appUser});
 
   final AppUser appUser;
 
@@ -132,46 +292,100 @@ class _StartupProfileSection extends ConsumerWidget {
         if (startup == null) {
           return const Text('No startup profile found.');
         }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                if (startup.isVerified) ...[
-                  const Icon(Icons.verified, size: 16, color: AppColors.tertiaryFixedDim),
-                  const SizedBox(width: 4),
-                ],
-                Text(startup.name, style: Theme.of(context).textTheme.titleMedium),
-              ],
+        return _MenuListCard(rows: [
+          _MenuRow(
+            icon: Icons.storefront_outlined,
+            label: 'My Profile',
+            large: true,
+            onTap: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => _EditStartupProfileSheet(startup: startup),
             ),
-            Text(
-              startup.category,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.outline),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(startup.description, style: Theme.of(context).textTheme.bodyMedium),
-            if (startup.website?.isNotEmpty ?? false) ...[
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                startup.website!,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.secondary),
-              ),
-            ],
-            const SizedBox(height: AppSpacing.lg),
-            OutlinedButton.icon(
-              onPressed: () => showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) => _EditStartupProfileSheet(startup: startup),
-              ),
-              icon: const Icon(Icons.edit_outlined),
-              label: const Text('Edit Profile'),
-            ),
-          ],
-        );
+          ),
+          _MenuRow(
+            icon: Icons.people_outline,
+            label: 'Applications Submitted',
+            large: true,
+            onTap: () => context.push('/applicants'),
+          ),
+        ]);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Text('Error: $error'),
+      error: (error, stack) => const AppErrorState(),
+    );
+  }
+}
+
+class _SkillsAndInterestsSheet extends StatelessWidget {
+  const _SkillsAndInterestsSheet({required this.appUser});
+
+  final AppUser appUser;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.marginMobile,
+        AppSpacing.lg,
+        AppSpacing.marginMobile,
+        MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Skills & Interests', style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: AppSpacing.lg),
+          Text('Skills', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.sm),
+          if (appUser.skills.isEmpty)
+            Text(
+              'No skills added yet.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+            )
+          else
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                for (final skill in appUser.skills)
+                  Chip(
+                    label: Text(skill),
+                    backgroundColor: AppColors.surfaceContainerLowest,
+                    labelStyle: const TextStyle(color: AppColors.tertiary),
+                    shape: StadiumBorder(
+                      side: const BorderSide(color: AppColors.tertiaryFixedDim, width: 1.5),
+                    ),
+                  ),
+              ],
+            ),
+          const SizedBox(height: AppSpacing.md),
+          Text('Portfolio URL', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            (appUser.portfolioUrl?.isNotEmpty ?? false) ? appUser.portfolioUrl! : 'Not added yet.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).pop();
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => _EditStudentProfileSheet(appUser: appUser),
+              );
+            },
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.tertiary,
+              side: const BorderSide(color: AppColors.tertiaryFixedDim),
+            ),
+            icon: const Icon(Icons.edit_outlined),
+            label: const Text('Edit'),
+          ),
+        ],
+      ),
     );
   }
 }

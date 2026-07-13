@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +13,7 @@ import '../auth/app_user.dart';
 import '../opportunities/opportunity_providers.dart';
 import '../opportunities/opportunity.dart';
 import '../startups/startup_providers.dart';
+import 'package:alu_bridge/core/widgets/app_error_state.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -56,7 +56,7 @@ class HomeScreen extends ConsumerWidget {
               : _StudentHomeBody(appUser: appUser);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
+        error: (error, stack) => const Center(child: AppErrorState()),
       ),
     );
   }
@@ -152,7 +152,7 @@ class _StudentHomeBody extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, s) => Text('Error: $e'),
+            error: (e, s) => const AppErrorState(),
           ),
           const SizedBox(height: AppSpacing.lg),
 
@@ -179,18 +179,14 @@ class _StudentHomeBody extends ConsumerWidget {
                         child: _ApplicationRow(application: app),
                       ),
                     OutlinedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Full applications list coming soon')),
-                        );
-                      },
+                      onPressed: () => context.push('/applications/mine'),
                       child: const Text('Check Status'),
                     ),
                   ],
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, s) => Text('Error: $e'),
+              error: (e, s) => const AppErrorState(),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -198,7 +194,7 @@ class _StudentHomeBody extends ConsumerWidget {
           // Startups You Applied To
           Row(
             children: [
-              const Icon(CupertinoIcons.briefcase_fill, color: AppColors.tertiary, size: 20),
+              const Icon(Icons.work_outline, color: AppColors.tertiary, size: 20),
               const SizedBox(width: AppSpacing.xs),
               Text('Startups You Applied To', style: Theme.of(context).textTheme.titleMedium),
             ],
@@ -227,7 +223,7 @@ class _StudentHomeBody extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, s) => Text('Error: $e'),
+            error: (e, s) => const AppErrorState(),
           ),
         ],
       ),
@@ -242,7 +238,10 @@ class _RecommendationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () => context.push('/opportunities/${opportunity.id}', extra: opportunity),
+      child: AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -303,6 +302,7 @@ class _RecommendationCard extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -316,7 +316,6 @@ class _ApplicationRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = switch (application.status) {
       ApplicationStatus.inReview => AppColors.tertiary,
-      ApplicationStatus.interviewed => AppColors.secondary,
       ApplicationStatus.accepted => AppColors.secondary,
       ApplicationStatus.rejected => AppColors.error,
     };
@@ -378,8 +377,7 @@ class _AppliedStartupRow extends StatelessWidget {
         const SizedBox(width: AppSpacing.md),
         Row(
           children: [
-            const Icon(CupertinoIcons.checkmark_seal_fill,
-                size: 14, color: AppColors.tertiaryFixedDim),
+            const Icon(Icons.verified, size: 14, color: AppColors.tertiaryFixedDim),
             const SizedBox(width: 4),
             Text(startupName, style: Theme.of(context).textTheme.labelSmall),
           ],
@@ -451,12 +449,18 @@ class _StartupHomeBody extends ConsumerWidget {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceContainerHighest,
+                            color: AppColors.primaryContainer,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           alignment: Alignment.center,
-                          child: const Icon(Icons.add_a_photo_outlined,
-                              color: AppColors.onSurfaceVariant),
+                          child: Text(
+                            startup.name.isNotEmpty ? startup.name[0].toUpperCase() : '?',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
@@ -525,7 +529,7 @@ class _StartupHomeBody extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Text('Error: $error'),
+            error: (error, stack) => const AppErrorState(),
           ),
           const SizedBox(height: AppSpacing.lg),
           Row(
@@ -548,32 +552,55 @@ class _StartupHomeBody extends ConsumerWidget {
                 children: [
                   for (final o in opportunities.take(2))
                     Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
                       child: AppCard(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(o.title, style: Theme.of(context).textTheme.labelSmall),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(o.title,
+                                      style: Theme.of(context).textTheme.titleMedium),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: o.isActive
+                                        ? AppColors.secondaryContainer
+                                        : AppColors.surfaceContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    o.isActive ? 'Active' : 'Closed',
+                                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                          color: o.isActive
+                                              ? AppColors.onSecondaryContainer
+                                              : AppColors.onSurfaceVariant,
+                                        ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: o.isActive
-                                    ? AppColors.secondaryContainer
-                                    : AppColors.surfaceContainer,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                o.isActive ? 'Active' : 'Closed',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: o.isActive
-                                          ? AppColors.onSecondaryContainer
-                                          : AppColors.onSurfaceVariant,
-                                    ),
-                              ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              '${o.type.label} · ${o.category}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: AppColors.onSurfaceVariant),
                             ),
+                            if (o.commitment.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                o.commitment,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(color: AppColors.outline),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -582,12 +609,7 @@ class _StartupHomeBody extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Text('Error: $error'),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          OutlinedButton(
-            onPressed: () => context.push('/startups'),
-            child: const Text('Browse ALU Startups'),
+            error: (error, stack) => const AppErrorState(),
           ),
         ],
       ),
